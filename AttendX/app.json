@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "AttendX",
+    "slug": "attendx",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/splash.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F4F6FA"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.attendx.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "AttendX needs your location to verify you are inside the classroom before signing attendance.",
+        "NSLocationAlwaysUsageDescription": "AttendX needs your location to verify you are inside the classroom."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1A6AFF"
+      },
+      "package": "com.attendx.app",
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "AttendX needs your location to verify you are physically inside the classroom before marking attendance."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#1A6AFF",
+          "sounds": [],
+          "androidMode": "default",
+          "androidCollapsedTitle": "AttendX"
+        }
+      ]
+    ],
+    
+    "extra": {
+      "eas": {
+        "projectId": "004aab68-948b-414a-adc5-5a9ee8fb4851"
+      }
+    }
+  }
+}
