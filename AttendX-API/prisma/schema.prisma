@@ -1,0 +1,118 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  CLASS_REP
+  LECTURER
+  ADMIN
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+}
+
+model User {
+  id         String   @id @default(uuid())
+  studentId  String   @unique
+  name       String
+  email      String   @unique
+  password   String
+  role       Role     @default(STUDENT)
+  programme  String?
+  year       String?
+  // Push notifications
+  pushToken  String?  // Expo push token — saved when student opens the app
+  // One account per device
+  deviceId   String?  // unique device identifier
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  attendanceLogs AttendanceLog[]
+  enrolments     CourseEnrolment[]
+  taughtCourses  Course[]          @relation("LecturerCourses")
+  notifications  Notification[]
+}
+
+model Course {
+  id         String   @id @default(uuid())
+  name       String
+  code       String   @unique
+  lecturerId String
+  lecturer   User     @relation("LecturerCourses", fields: [lecturerId], references: [id])
+  createdAt  DateTime @default(now())
+
+  sessions   Session[]
+  enrolments CourseEnrolment[]
+}
+
+model CourseEnrolment {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  courseId   String
+  course     Course   @relation(fields: [courseId], references: [id])
+  isClassRep Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  courseId     String
+  course       Course   @relation(fields: [courseId], references: [id])
+  weekNumber   Int
+  sessionType  String   @default("Lecture")
+  startTime    DateTime
+  endTime      DateTime
+  latitude     Float?
+  longitude    Float?
+  radiusMeters Int      @default(50)
+  locationSetBy String?
+  locationSetAt DateTime?
+  isOpen       Boolean  @default(false)
+  closedAt     DateTime?
+  createdAt    DateTime @default(now())
+
+  attendanceLogs AttendanceLog[]
+  notifications  Notification[]
+}
+
+model AttendanceLog {
+  id          String           @id @default(uuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  sessionId   String
+  session     Session          @relation(fields: [sessionId], references: [id])
+  status      AttendanceStatus @default(PRESENT)
+  signedAt    DateTime         @default(now())
+  gpsLat      Float
+  gpsLng      Float
+  distanceM   Float
+  verified    Boolean          @default(true)
+
+  @@unique([userId, sessionId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id])
+  title     String
+  body      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
